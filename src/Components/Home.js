@@ -186,8 +186,8 @@ export default function Home() {
         </div>
       </Container>
       <Body />
-      {/* Footer */}
-      <Footer />
+    
+      
     </React.Fragment>
   );
 }

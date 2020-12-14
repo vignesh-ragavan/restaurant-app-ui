@@ -27,6 +27,8 @@ import EditIcon from "@material-ui/icons/Edit";
 import LocalOfferIcon from "@material-ui/icons/LocalOffer";
 import CheckIcon from "@material-ui/icons/Check";
 import { Link } from "react-router-dom";
+import FoodService from "../../Service/FoodService";
+import FoodCard from "./FoodCard";
 
 const categoryStatusList = [
   {
@@ -39,74 +41,42 @@ const categoryStatusList = [
   },
 ];
 
-export class ViewCategory extends Component {
+export class ViewFood extends Component {
   constructor(props) {
     super(props);
 
+    this.deleteFood = this.deleteFood.bind(this);
+    this.editFood = this.editFood.bind(this);
+    this.readForm = this.readForm.bind(this);
+
     this.state = {
-      catList: [],
+      foodList: [],
       shouldOpenDialogue: false,
-      category: {
-        id: "",
+      food: {
         catName: "",
-        patCat: "",
+        foodName: "",
         image: "",
-        offer: "",
-        status: "Active",
-        checked: false,
+        notes: "",
+        description: "",
+        vat: "",
+        offer: false,
+        special: false,
+        cookingTime: "",
+        status: false,
       },
     };
+
     
-    this.deleteCategory = this.deleteCategory.bind(this);
-    this.editCategory = this.editCategory.bind(this);
-    this.readForm = this.readForm.bind(this);
   }
-
-  readForm = (e) => {
-    console.log(e.target.value);
-    //this.setState({ [e.target.name]: e.target.value });
-    this.setState(
-      Object.assign(this.state.category, { [e.target.name]: e.target.value })
-    );
-    // console.log("after update   " + this.state.category.catName);
-  };
-
-  deleteCategory(id) {
-    console.log("i am in delete category " + id);
-    CategoryService.deleteCategory(id).then(
-      (resp) => {
-        this.setState({ catList: resp.data });
-      },
-      (error) => {
-        console.error("error s " + error.data);
-      }
-    );
-  }
-
-  editCategory(id) {
-    console.log("i am in edit category" + id);
-    CategoryService.getCategory(id).then(
-      (resp) => {
-        console.log(resp.data);
-        this.setState({ category: resp.data });
-      },
-      (error) => {
-        console.error(error.data);
-      }
-    );
-
-    this.setState({ shouldOpenDialogue: true });
-  }
-
   handleClose = () => {
     console.log(JSON.stringify(this.state.category));
-    CategoryService.updateCategory(this.state.category).then(
+    FoodService.updateFood(this.state.category).then(
       (resp) => {
         console.log("category updated  " + resp.data.catName);
-        CategoryService.fetchAllCategories().then((resp) => {
+        FoodService.fetchAllFood().then((resp) => {
           console.log("backend categories are " + JSON.stringify(resp.data));
           //this.state.catList = resp.data;
-          this.setState({ catList: resp.data });
+          this.setState({ foodList: resp.data });
         });
       },
       (error) => {
@@ -117,14 +87,53 @@ export class ViewCategory extends Component {
 
     this.setState({ shouldOpenDialogue: false });
   };
+   
+
+  readForm = (e) => {
+    console.log(e.target.value);
+    //this.setState({ [e.target.name]: e.target.value });
+    this.setState(
+      Object.assign(this.state.food, { [e.target.name]: e.target.value })
+    );
+    // console.log("after update   " + this.state.category.catName);
+  };
+
+  deleteFood(id) {
+    console.log("i am in delete category " + id);
+    FoodService.deleteFood(id).then(
+      (resp) => {
+        this.setState({ foodList: resp.data });
+      },
+      (error) => {
+        console.error("error s " + error.data);
+      }
+    );
+  }
+
+  editFood(id) {
+    console.log("i am in edit category" + id);
+    FoodService.getFood(id).then(
+      (resp) => {
+        console.log(resp.data);
+        this.setState({ food: resp.data });
+      },
+      (error) => {
+        console.error(error.data);
+      }
+    );
+
+    this.setState({ shouldOpenDialogue: true });
+  }
 
   componentDidMount() {
-    CategoryService.fetchAllCategories().then((resp) => {
-      console.log("backend categories are " + JSON.stringify(resp.data));
-      //this.state.catList = resp.data;
-      this.setState({ catList: resp.data });
-    });
-    // console.log("categories are " + JSON.stringify(this.state.catList));
+    FoodService.fetchAllFoods().then(
+      (resp) => {
+        this.setState({ foodList: resp.data });
+      },
+      (error) => {
+        console.error(error.data);
+      }
+    );
   }
 
   render() {
@@ -132,10 +141,9 @@ export class ViewCategory extends Component {
       <div>
         <MerchantDashboard />
         <Grid container spacing={3}>
-          {this.state.catList.map((category) => (
+          {this.state.foodList.map((food) => (
             <Grid item xs={6} sm={3}>
               <Paper>
-                {/* <CategoryListGrid /> */}
                 <Card>
                   <CardActionArea>
                     <CardMedia
@@ -144,36 +152,26 @@ export class ViewCategory extends Component {
                     />
                     <CardContent>
                       <Typography gutterBottom variant="h5" component="h2">
-                        {category.catName}
+                        {food.foodName}
                         <CardActions>
                           <Button size="small" color="primary">
                             {/* <CheckIcon /> */}
-                            {category.status}
+                            {food.status}
                           </Button>
                           <Button size="small" color="primary">
                             <LocalOfferIcon />
-                            Offer: {category.offer}
+                            Offer: {food.offer}
                           </Button>
                         </CardActions>
                       </Typography>
-
-                      {/* <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        component="p"
-                      >
-                        Lizards are a widespread group of squamate reptiles,
-                        with over 6,000 species, ranging across all continents
-                        except Antarctica
-                      </Typography> */}
                     </CardContent>
                   </CardActionArea>
                   <CardActions>
-                    <Button
+                  <Button
                       size="small"
                       color="primary"
                       onClick={() => {
-                        this.editCategory(category.id);
+                        this.editFood(food.id);
                       }}
                     >
                       <EditIcon /> Edit
@@ -182,7 +180,7 @@ export class ViewCategory extends Component {
                       size="small"
                       color="secondary"
                       onClick={() => {
-                        this.deleteCategory(category.id);
+                        this.deleteFood(food.id);
                       }}
                     >
                       <DeleteForeverIcon /> Delete
@@ -228,13 +226,13 @@ export class ViewCategory extends Component {
                   size="normal"
                   name="catName"
                   onChange={this.readForm}
-                  value={this.state.category.catName}
+                  value={this.state.food.catName}
                 />
                 <TextField
                   id="outlined-required"
                   select
                   //label="Parent Category"
-                  value={this.state.patCat}
+                  value={this.state.food}
                   name="patCat"
                   onChange={this.readForm}
                   SelectProps={{
@@ -243,10 +241,10 @@ export class ViewCategory extends Component {
                   helperText="Select the Parent Category"
                   variant="outlined"
                 >
-                  <option value={this.state.category.patCat}>
-                    {this.state.category.patCat}
+                  <option value={this.state.food.foodName}>
+                    {this.state.food.foodName}
                   </option>
-                  {this.state.catList.map((option) => (
+                  {this.state.foodList.map((option) => (
                     <option key={option.catName} value={option.catName}>
                       {option.catName}
                     </option>
@@ -270,7 +268,7 @@ export class ViewCategory extends Component {
                 <Typography>
                   Is Offer ?
                   <Checkbox
-                    checked={this.state.category.offer}
+                    checked={this.state.food.offer}
                     onChange={this.handleChange}
                     inputProps={{ "aria-label": "primary checkbox" }}
                   />
@@ -289,7 +287,7 @@ export class ViewCategory extends Component {
                   helperText="Select the Status"
                   variant="outlined"
                 >
-                  <option>{this.state.category.status}</option>
+                  <option>{this.state.food.status}</option>
                   {categoryStatusList.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -321,4 +319,4 @@ export class ViewCategory extends Component {
   }
 }
 
-export default ViewCategory;
+export default ViewFood;

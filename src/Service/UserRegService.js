@@ -1,7 +1,7 @@
 import react from "react";
 import axios from "axios";
 
-const USER_REG_BASE_URL = "http://localhost:6050/user-reg-service/api/";
+const USER_REG_BASE_URL = "http://localhost:6050/user-reg-service/api";
 
 class UserRegService {
   // this is used to regiter user in AUTH0 IDP

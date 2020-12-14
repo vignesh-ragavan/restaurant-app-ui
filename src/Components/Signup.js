@@ -95,7 +95,7 @@ export class Signup extends Component {
         email: this.state.email,
         userId: this.state.userId,
         password: "dummy@123",
-        cpassword: "dummy@123",
+       cpassword: "dummy@123",
         mobile: this.state.mobile,
       };
       console.log("user registration data is");
